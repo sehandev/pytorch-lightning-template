@@ -11,21 +11,16 @@ import torch.nn.functional as F
 class CustomModel(nn.Module):
     def __init__(
         self,
-        input_size,
-        d_model,
-        num_layer,
-        dropout=0.3,
-        bidirectional=False,
+        model_option,
     ):
         super().__init__()
 
         self.rnn = nn.LSTM(
-            input_size=input_size,
-            hidden_size=d_model,
-            num_layers=num_layer,
+            input_size=model_option['input_size'],
+            hidden_size=model_option['d_model'],
+            num_layers=model_option['num_layer'],
             batch_first=True,
-            dropout=dropout,
-            bidirectional=bidirectional,
+            dropout=0.3,
         )
 
         self.init_weights()
