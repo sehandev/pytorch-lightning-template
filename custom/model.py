@@ -20,7 +20,7 @@ class CustomModel(nn.Module):
             hidden_size=model_option['d_model'],
             num_layers=model_option['num_layer'],
             batch_first=True,
-            dropout=0.3,
+            dropout=model_option['dropout'],
         )
 
         self.init_weights()
