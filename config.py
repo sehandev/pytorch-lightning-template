@@ -30,7 +30,6 @@ class Config:
     SEQ_LEN = 10
 
     def __init__(self, seed=None):
-        print(type(self.DATA_DIR))
         self.set_random_seed(seed)
 
     def set_random_seed(self, seed):
