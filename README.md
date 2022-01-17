@@ -1,5 +1,7 @@
 <div align="center">
+
 ## PyTorch Lightning Template
+
 </div>
 
 Get W&B API key from https://wandb.ai/authorize
