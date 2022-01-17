@@ -15,22 +15,22 @@ class CustomModel(nn.Module):
     ):
         super().__init__()
 
-        self.rnn = nn.LSTM(
-            input_size=model_option['input_size'],
-            hidden_size=model_option['d_model'],
-            num_layers=model_option['num_layer'],
-            batch_first=True,
-            dropout=model_option['dropout'],
+        self.encoder = nn.Sequential(
+            nn.Linear(28 * 28, model_option['d_model']),
+            nn.ReLU(),
+            nn.Linear(model_option['d_model'], 3),
+        )
+        self.decoder = nn.Sequential(
+            nn.Linear(3, model_option['d_model']),
+            nn.ReLU(),
+            nn.Linear(model_option['d_model'], 28 * 28),
         )
 
-        self.init_weights()
-
-    def init_weights(self):
-        nn.init.kaiming_normal_(self.rnn.weight, mode='fan_in')
-        self.rnn.bias.data.zero_()
-
     def forward(self, x):
-        # x: (batch_size, seq_len, d_model)
+        # x: (batch_size, 1, 28, 28)
 
-        rnn_output, _ = self.rnn(x)
-        return rnn_output
+        x = x.view(x.size(0), -1)
+        z = self.encoder(x)
+        x_hat = self.decoder(z)
+
+        return x, x_hat

@@ -12,14 +12,14 @@ from ray.tune.integration.pytorch_lightning import TuneReportCallback
 
 # Custom
 from config import Config
-from c_dataset import CustomDataModule
+from data_module import CustomDataModule
 from module import CustomModule
 
 
 ray.init(dashboard_host='0.0.0.0')
 
 
-def train_tune(config, num_gpus=0, num_epochs=10):
+def train_tune(config, num_gpus=0, num_epochs=10, checkpoint_dir=None):
     cfg = Config(config['seed'])
 
     wandb_logger = WandbLogger(
@@ -38,8 +38,8 @@ def train_tune(config, num_gpus=0, num_epochs=10):
         gpus=num_gpus,
         max_epochs=num_epochs,
         logger=wandb_logger,
-        progress_bar_refresh_rate=0,
-        accelerator='dp',
+        enable_progress_bar=True if cfg.IS_PROGRESS_LOG_ON else false,
+        strategy='dp',  # dp, ddp, deepspeed_stage_3
         deterministic=True,
         precision=16,
         callbacks=[
@@ -69,10 +69,10 @@ def tune_asha(num_samples=10, num_epochs=10):
     num_cpus = 2
     num_gpus = 1
 
-    config = {
-        'seed': tune.randint(0, 1000),
-        'learning_rate': tune.loguniform(1e-6, 1e-2),
-        'batch_size': tune.choice([128, 256, 512]),
+    tune_config = {
+        'seed': tune.randint(0, 10),
+        'learning_rate': tune.loguniform(1e-4, 1e-2),
+        'batch_size': tune.choice([32, 64]),
     }
 
     optuna_search = OptunaSearch(
@@ -82,7 +82,7 @@ def tune_asha(num_samples=10, num_epochs=10):
 
     scheduler = ASHAScheduler(
         max_t=num_epochs,
-        grace_period=20,
+        grace_period=1,
         reduction_factor=2,
     )
 
@@ -105,7 +105,7 @@ def tune_asha(num_samples=10, num_epochs=10):
         },
         metric='loss',
         mode='min',
-        config=config,
+        config=tune_config,
         num_samples=num_samples,
         scheduler=scheduler,
         search_alg=optuna_search,

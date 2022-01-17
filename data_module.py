@@ -3,6 +3,7 @@
 # PIP
 from torch.utils.data import DataLoader
 from pytorch_lightning import LightningDataModule
+from pl_bolts.datasets import DummyDataset
 
 # Custom
 from custom.dataset import CustomDataset
@@ -23,15 +24,18 @@ class CustomDataModule(LightningDataModule):
         self.set_datasets()
 
     def set_datasets(self):
-        self.train_dataset = CustomDataset(
-            seq_len=self.seq_len,
-        )
-        self.valid_dataset = CustomDataset(
-            seq_len=self.seq_len,
-        )
-        self.test_dataset = CustomDataset(
-            seq_len=self.seq_len,
-        )
+        # self.train_dataset = CustomDataset(
+        #     seq_len=self.seq_len,
+        # )
+        # self.valid_dataset = CustomDataset(
+        #     seq_len=self.seq_len,
+        # )
+        # self.test_dataset = CustomDataset(
+        #     seq_len=self.seq_len,
+        # )
+        self.train_dataset = DummyDataset((1, 28, 28), (1,))
+        self.valid_dataset = DummyDataset((1, 28, 28), (1,))
+        self.test_dataset = DummyDataset((1, 28, 28), (1,))
 
     def train_dataloader(self):
         return DataLoader(
@@ -45,7 +49,7 @@ class CustomDataModule(LightningDataModule):
         return DataLoader(
             self.valid_dataset,
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=False,
             num_workers=self.num_workers,
         )
 
@@ -53,6 +57,6 @@ class CustomDataModule(LightningDataModule):
         return DataLoader(
             self.test_dataset,
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=False,
             num_workers=self.num_workers,
         )

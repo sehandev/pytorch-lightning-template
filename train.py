@@ -39,8 +39,8 @@ trainer = Trainer(
     gpus=cfg.GPUS,
     max_epochs=cfg.MAX_EPOCHS,
     logger=wandb_logger,
-    progress_bar_refresh_rate=1 if cfg.IS_PROGRESS_LOG_ON else 0,
-    accelerator='dp',
+    enable_progress_bar=True if cfg.IS_PROGRESS_LOG_ON else false,
+    strategy='dp',  # dp, ddp, deepspeed_stage_3
     deterministic=True,
     precision=16,
     callbacks=[
@@ -68,7 +68,7 @@ print('Start model fitting')
 trainer.fit(module, datamodule=data_module)
 
 print('Start testing')
-trainer.test(datamodule=data_module)
+trainer.test(datamodule=data_module, ckpt_path='best')
 
 print(f'Best model : {checkpoint_callback.best_model_path}')
 

@@ -1,1 +1,8 @@
 # pytorch-lightning-template
+
+Get W&B API key from https://wandb.ai/authorize
+
+```bash
+pip install -r requirements.txt
+wandb login
+```

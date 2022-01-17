@@ -2,3 +2,4 @@ pytorch-lightning
 ray[tune]
 optuna
 wandb
+deepspeed

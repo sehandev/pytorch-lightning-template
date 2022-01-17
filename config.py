@@ -16,11 +16,12 @@ class Config:
     DATA_DIR = PROJECT_DIR / 'data'
 
     # Training
-    GPUS = [0, 1, 2, 3]
-    MAX_EPOCHS = 20
+    GPUS = 4  # ex: 2, [0, 1, 2, 3]
+    MAX_EPOCHS = 3
     EARLYSTOP_PATIENCE = 10
-    BATCH_SIZE = 32
-    LEARNING_RATE = 1e-2
+    BATCH_SIZE = 1024
+    NUM_WORKERS = 0
+    LEARNING_RATE = 1e-3
     CRITERION = 'RMSE'
     OPTIMIZER = 'AdamW'
     LR_SCHEDULER = 'StepLR'
