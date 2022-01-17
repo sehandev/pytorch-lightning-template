@@ -15,7 +15,7 @@ class CustomModule(pl.LightningModule):
     def __init__(
         self,
         model_option,
-        max_epoch,
+        max_epochs,
         learning_rate=1e-2,
         criterion_name='RMSE',
         optimizer_name='Adam',
@@ -23,7 +23,7 @@ class CustomModule(pl.LightningModule):
         momentum=0.9,
     ):
         super().__init__()
-        self.max_epoch = max_epoch
+        self.max_epochs = max_epochs
         self.learning_rate = learning_rate
         self.momentum = momentum
 
@@ -48,7 +48,8 @@ class CustomModule(pl.LightningModule):
         elif name == 'BCE'.lower():
             return nn.BCEWithLogitsLoss()
 
-        raise ValueError(f'{loss_function_name} is not on the custom criterion list!')
+        raise ValueError(
+            f'{loss_function_name} is not on the custom criterion list!')
 
     def get_optimizer(self, optimizer_name):
         name = optimizer_name.lower()
@@ -60,7 +61,8 @@ class CustomModule(pl.LightningModule):
         elif name == 'AdamW'.lower():
             return torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
 
-        raise ValueError(f'{optimizer_name} is not on the custom optimizer list!')
+        raise ValueError(
+            f'{optimizer_name} is not on the custom optimizer list!')
 
     def get_lr_scheduler(self, scheduler_name):
         name = scheduler_name.lower()
@@ -69,7 +71,7 @@ class CustomModule(pl.LightningModule):
             return OneCycleLR(
                 optimizer=self.optimizer,
                 max_lr=self.learning_rate,
-                total_steps=self.max_epoch,
+                total_steps=self.max_epochs,
                 anneal_strategy='cos',
             )
         elif name == 'CosineAnnealingWarmRestarts'.lower():
@@ -86,7 +88,8 @@ class CustomModule(pl.LightningModule):
                 gamma=0.1,
             )
 
-        raise ValueError(f'{scheduler_name} is not on the custom scheduler list!')
+        raise ValueError(
+            f'{scheduler_name} is not on the custom scheduler list!')
 
     def forward(self, x):
         # x : (batch_size, ???)
@@ -107,15 +110,9 @@ class CustomModule(pl.LightningModule):
         # x: (batch_size, ???)
         # y: (batch_size, ???)
 
-        y_hat = self(x)
-        # y_hat: (batch_size, ???)
+        x, x_hat = self(x)
 
-        loss = 0
-        for batch_y_hat, batch_y in zip(y_hat, y):
-            batch_loss = self.criterion(batch_y_hat, batch_y)
-            loss += batch_loss
-
-        loss /= len(y_hat)
+        loss = self.criterion(x_hat, x)
 
         return loss
 
@@ -130,7 +127,8 @@ class CustomModule(pl.LightningModule):
 
         loss = self.common_step(batch, state='valid')
 
-        self.log('val_loss', loss, prog_bar=True, sync_dist=True, on_step=False, on_epoch=True)
+        self.log('val_loss', loss, prog_bar=True,
+                 sync_dist=True, on_step=False, on_epoch=True)
 
     def test_step(self, batch, batch_idx):
 
