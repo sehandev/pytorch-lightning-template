@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  dev:
+    image: pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel
+    working_dir: /workspace
+    volumes:
+      - .:/workspace
+    environment:
+      - TZ=Asis/Seoul
+    shm_size: '8gb'
+    deploy:
+      resources:
+        reservations:
+          devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+    stdin_open: true
