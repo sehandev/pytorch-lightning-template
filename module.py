@@ -12,30 +12,18 @@ import helper.loss as c_loss
 
 
 class CustomModule(pl.LightningModule):
-    def __init__(
-        self,
-        model_option,
-        max_epochs,
-        learning_rate=1e-2,
-        criterion_name='RMSE',
-        optimizer_name='Adam',
-        lr_scheduler_name='StepLR',
-        momentum=0.9,
-    ):
+    def __init__(self, cfg):
         super().__init__()
-        self.max_epochs = max_epochs
-        self.learning_rate = learning_rate
-        self.momentum = momentum
+        self.cfg = cfg
 
-        self.model = CustomModel(model_option)
+        self.model = CustomModel(cfg.model)
 
-        self.criterion = self.get_loss_function(criterion_name)
-        self.optimizer = self.get_optimizer(optimizer_name)
-        self.lr_scheduler = self.get_lr_scheduler(lr_scheduler_name)
+        self.criterion = self.get_loss_function()
+        self.optimizer = self.get_optimizer()
+        self.lr_scheduler = self.get_lr_scheduler()
 
-    @staticmethod
-    def get_loss_function(loss_function_name):
-        name = loss_function_name.lower()
+    def get_loss_function(self):
+        name = self.cfg.module.criterion.lower()
 
         if name == 'RMSE'.lower():
             return c_loss.RMSELoss()
@@ -49,47 +37,49 @@ class CustomModule(pl.LightningModule):
             return nn.BCEWithLogitsLoss()
 
         raise ValueError(
-            f'{loss_function_name} is not on the custom criterion list!')
+            f'{name} is not on the custom criterion list!')
 
-    def get_optimizer(self, optimizer_name):
-        name = optimizer_name.lower()
+    def get_optimizer(self):
+        name = self.cfg.optimizer.name.lower()
 
         if name == 'SGD'.lower():
-            return torch.optim.SGD(self.parameters(), lr=self.learning_rate, momentum=self.momentum)
+            return torch.optim.SGD(self.parameters(), lr=self.cfg.optimizer.lr, momentum=self.cfg.optimizer.momentum)
         elif name == 'Adam'.lower():
-            return torch.optim.Adam(self.parameters(), lr=self.learning_rate)
+            return torch.optim.Adam(self.parameters(), lr=self.cfg.optimizer.lr)
         elif name == 'AdamW'.lower():
-            return torch.optim.AdamW(self.parameters(), lr=self.learning_rate)
+            return torch.optim.AdamW(self.parameters(), lr=self.cfg.optimizer.lr)
 
         raise ValueError(
-            f'{optimizer_name} is not on the custom optimizer list!')
+            f'{name} is not on the custom optimizer list!')
 
-    def get_lr_scheduler(self, scheduler_name):
-        name = scheduler_name.lower()
+    def get_lr_scheduler(self):
+        name = self.cfg.lr_scheduler.name.lower()
 
+        if name == 'None'.lower():
+            return None
         if name == 'OneCycleLR'.lower():
             return OneCycleLR(
                 optimizer=self.optimizer,
-                max_lr=self.learning_rate,
-                total_steps=self.max_epochs,
-                anneal_strategy='cos',
+                max_lr=self.cfg.optimizer.lr,
+                total_steps=self.cfg.trainer.max_epochs,
+                anneal_strategy=self.cfg.lr_scheduler.anneal_strategy,
             )
         elif name == 'CosineAnnealingWarmRestarts'.lower():
             return CosineAnnealingWarmRestarts(
                 optimizer=self.optimizer,
-                T_0=30,
-                T_mult=1,
-                eta_min=self.learning_rate/10000,
+                T_0=self.cfg.lr_scheduler.T_0,
+                T_mult=self.cfg.lr_scheduler.T_mult,
+                eta_min=self.cfg.lr_scheduler.eta_min,
             )
         elif name == 'StepLR'.lower():
             return StepLR(
                 optimizer=self.optimizer,
-                step_size=10,
-                gamma=0.1,
+                step_size=self.cfg.lr_scheduler.step_size,
+                gamma=self.cfg.lr_scheduler.gamma,
             )
 
         raise ValueError(
-            f'{scheduler_name} is not on the custom scheduler list!')
+            f'{name} is not on the custom scheduler list!')
 
     def forward(self, x):
         # x : (batch_size, ???)
@@ -100,6 +90,9 @@ class CustomModule(pl.LightningModule):
         return out
 
     def configure_optimizers(self):
+        if self.lr_scheduler is None:
+            return self.optimizer
+
         return {
             'optimizer': self.optimizer,
             'lr_scheduler': self.lr_scheduler,

@@ -1,0 +1,3 @@
+common:
+  work_dir: ${hydra:runtime.cwd}
+  seed: 42

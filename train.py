@@ -12,74 +12,50 @@ from data_module import CustomDataModule
 from module import CustomModule
 
 
-cfg = Config()
+def train(cfg):
+    wandb_logger = WandbLogger(
+        project=cfg.logger.project,
+        name=cfg.logger.name,
+    )
 
-wandb_logger = WandbLogger(
-    project=cfg.PROJECT_TITLE,
-    name=cfg.WANDB_NAME,
-)
+    callback_list = []
 
-early_stop_callback = EarlyStopping(
-    monitor='val_loss',
-    min_delta=0.00,
-    patience=cfg.EARLYSTOP_PATIENCE,
-    verbose=False,
-    mode='min'
-)
+    if cfg.callbacks.checkpoint:
+        checkpoint_callback = ModelCheckpoint(
+            monitor='val_loss',
+            dirpath='./checkout/',
+            filename=cfg.logger.project + '-{epoch:04d}-{val_loss:.5f}',
+            save_top_k=1,
+            mode='min',
+        )
+        callback_list.append(checkpoint_callback)
 
-checkpoint_callback = ModelCheckpoint(
-    monitor='val_loss',
-    dirpath='./checkout/',
-    filename=cfg.PROJECT_TITLE + '-{epoch:04d}-{val_loss:.5f}',
-    save_top_k=1,
-    mode='min',
-)
+    if cfg.callbacks.early_stop:
+        early_stop_callback = EarlyStopping(
+            monitor='val_loss',
+            min_delta=0.00,
+            patience=cfg.callbacks.patience,
+            verbose=False,
+            mode='min'
+        )
+        callback_list.append(early_stop_callback)
 
-trainer = Trainer(
-    gpus=cfg.GPUS,
-    max_epochs=cfg.MAX_EPOCHS,
-    logger=wandb_logger,
-    enable_progress_bar=True if cfg.IS_PROGRESS_LOG_ON else false,
-    strategy='dp',  # dp, ddp, deepspeed_stage_3
-    deterministic=True,
-    precision=16,
-    callbacks=[
-        early_stop_callback,
-        checkpoint_callback,
-    ],
-)
+    trainer = Trainer(
+        logger=wandb_logger,
+        callbacks=callback_list,
+        gpus=cfg.trainer.gpus,
+        enable_progress_bar=cfg.trainer.progress_bar,
+        max_epochs=cfg.trainer.max_epochs,
+        strategy=cfg.trainer.strategy,  # dp, ddp, deepspeed_stage_3
+        precision=cfg.trainer.precision,
+        deterministic=cfg.trainer.deterministic,
+    )
 
-data_module = CustomDataModule(
-    seq_len=cfg.SEQ_LEN,
-    batch_size=cfg.BATCH_SIZE,
-    num_workers=cfg.NUM_WORKERS,
-)
+    data_module = CustomDataModule(cfg)
+    module = CustomModule(cfg)
 
-module = CustomModule(
-    model_option=cfg.model_option,
-    max_epochs=cfg.MAX_EPOCHS,
-    learning_rate=cfg.LEARNING_RATE,
-    criterion_name=cfg.CRITERION,
-    optimizer_name=cfg.OPTIMIZER,
-    lr_scheduler_name=cfg.LR_SCHEDULER,
-)
+    print('Start model fitting')
+    trainer.fit(module, datamodule=data_module)
 
-print('Start model fitting')
-trainer.fit(module, datamodule=data_module)
-
-print('Start testing')
-trainer.test(datamodule=data_module, ckpt_path='best')
-
-print(f'Best model : {checkpoint_callback.best_model_path}')
-
-module = CustomModule.load_from_checkpoint(
-    checkpoint_callback.best_model_path,
-    model_option=cfg.model_option,
-    max_epochs=cfg.MAX_EPOCHS,
-    learning_rate=cfg.LEARNING_RATE,
-    criterion_name=cfg.CRITERION,
-    optimizer_name=cfg.OPTIMIZER,
-    lr_scheduler_name=cfg.LR_SCHEDULER,
-)
-
-torch.save(module.model.state_dict(), f'./output/{cfg.PROJECT_TITLE}.pt')
+    print('Start testing')
+    trainer.test(datamodule=data_module, ckpt_path='best')

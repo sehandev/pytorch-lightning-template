@@ -1,0 +1,17 @@
+defaults:
+  - _self_
+  - common
+  - logger
+  - trainer
+  - module
+  - data_module
+  - callbacks:
+    - checkpoint
+    - early_stop
+  - model: base
+  - optimizer: adamw
+  - lr_scheduler: cosine_annealing
+
+# Override
+optimizer:
+  lr: 1e-3

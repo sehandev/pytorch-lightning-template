@@ -1,0 +1,10 @@
+trainer:
+  callbacks:
+    checkpoint: true
+    early_stop: true
+  gpus: 4
+  progress_bar: true
+  max_epochs: 3
+  strategy: dp  # dp, ddp, deepspeed_stage_3, ...
+  precision: 16  # 16, 32, 64
+  deterministic: true

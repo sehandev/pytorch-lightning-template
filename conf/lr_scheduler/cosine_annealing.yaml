@@ -1,0 +1,4 @@
+name: CosineAnnealingWarmRestarts
+T_0: 30
+T_mult: 1
+eta_min: 1e-7
