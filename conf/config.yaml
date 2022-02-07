@@ -11,7 +11,3 @@ defaults:
   - model: base
   - optimizer: adamw
   - lr_scheduler: cosine_annealing
-
-# Override
-optimizer:
-  lr: 1e-3
