@@ -9,5 +9,5 @@ defaults:
     - checkpoint
     - early_stop
   - model: base
-  - optimizer: adamw
-  - lr_scheduler: cosine_annealing
+  - optimizer: adam
+  - lr_scheduler: none
