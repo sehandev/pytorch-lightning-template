@@ -46,7 +46,7 @@ def train(cfg):
         gpus=cfg.trainer.gpus,
         enable_progress_bar=cfg.trainer.progress_bar,
         max_epochs=cfg.trainer.max_epochs,
-        strategy=cfg.trainer.strategy,  # dp, ddp, deepspeed_stage_3
+        strategy=cfg.trainer.strategy,
         precision=cfg.trainer.precision,
         deterministic=cfg.trainer.deterministic,
     )
