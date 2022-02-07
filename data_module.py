@@ -4,7 +4,6 @@ from pathlib import Path
 # PIP
 from torch.utils.data import DataLoader
 from pytorch_lightning import LightningDataModule
-from pl_bolts.datasets import DummyDataset
 
 # Custom
 from custom.dataset import CustomDataset
@@ -16,23 +15,21 @@ class CustomDataModule(LightningDataModule):
         self.cfg = cfg
 
         work_dir = Path(cfg.common.work_dir).absolute()
-        self.data_dir = work_dir / cfg.data_module.data_dir
+        self.data_dir = work_dir / cfg.dataset.data_dir
 
-        self.set_datasets()
-
-    def set_datasets(self):
-        # self.train_dataset = CustomDataset(
-        #     seq_len=self.seq_len,
-        # )
-        # self.valid_dataset = CustomDataset(
-        #     seq_len=self.seq_len,
-        # )
-        # self.test_dataset = CustomDataset(
-        #     seq_len=self.seq_len,
-        # )
-        self.train_dataset = DummyDataset((1, 28, 28), (1,))
-        self.valid_dataset = DummyDataset((1, 28, 28), (1,))
-        self.test_dataset = DummyDataset((1, 28, 28), (1,))
+    def setup(self, stage=None):
+        self.train_dataset = CustomDataset(
+            data_dir=self.data_dir,
+            seq_len=self.cfg.dataset.seq_len,
+        )
+        self.valid_dataset = CustomDataset(
+            data_dir=self.data_dir,
+            seq_len=self.cfg.dataset.seq_len,
+        )
+        self.test_dataset = CustomDataset(
+            data_dir=self.data_dir,
+            seq_len=self.cfg.dataset.seq_len,
+        )
 
     def train_dataloader(self):
         return DataLoader(

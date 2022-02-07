@@ -10,8 +10,10 @@ from torch.utils.data import Dataset
 class CustomDataset(Dataset):
     def __init__(
         self,
+        data_dir,
         seq_len=10,
     ):
+        print(data_dir)
         xs = self.create_sequence(seq_len)
 
         self.xs = torch.tensor(xs, dtype=torch.float)
@@ -28,7 +30,7 @@ class CustomDataset(Dataset):
 
 
 if __name__ == '__main__':
-    test_dataset = CustomDataset(seq_len=3)
+    test_dataset = CustomDataset(data_dir='data/', seq_len=3)
     print(f'Length: {len(test_dataset)}')
     print(f'Index 0: {test_dataset[0]}')
     print(f'Index 1: {test_dataset[1]}')
