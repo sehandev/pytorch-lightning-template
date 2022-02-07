@@ -3,6 +3,3 @@ deepspeed
 hydra-core
 pytorch-lightning
 wandb
-
-# --- Test ---
-lightning-bolts
