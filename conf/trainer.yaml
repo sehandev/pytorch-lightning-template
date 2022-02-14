@@ -1,7 +1,4 @@
 trainer:
-  callbacks:
-    checkpoint: true
-    early_stop: true
   gpus: 4
   progress_bar: true
   max_epochs: 3
