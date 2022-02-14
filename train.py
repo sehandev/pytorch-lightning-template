@@ -7,7 +7,6 @@ from pytorch_lightning.callbacks import EarlyStopping, ModelCheckpoint
 from pytorch_lightning.loggers import WandbLogger
 
 # Custom
-from config import Config
 from data_module import CustomDataModule
 from module import CustomModule
 
