@@ -7,7 +7,7 @@ import pytorch_lightning as pl
 from train import train
 
 
-@hydra.main(config_path='conf', config_name='config')
+@hydra.main(version_base=None, config_path='conf', config_name='config')
 def main(cfg: DictConfig) -> None:
     print('--- [ Config List ] ---')
     print(OmegaConf.to_yaml(cfg))
