@@ -4,10 +4,13 @@
 
 </div>
 
+# Before we start
+
 Get W&B API key from https://wandb.ai/authorize
 
 ```bash
-pip install -r requirements.txt
+pip install poetry
+poetry install
 wandb login
 ```
 

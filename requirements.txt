@@ -1,5 +1,0 @@
-# --- Train ---
-deepspeed
-hydra-core
-pytorch-lightning
-wandb
