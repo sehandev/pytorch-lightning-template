@@ -29,8 +29,8 @@ class CustomDataset(Dataset):
         return self.xs[idx]
 
 
-if __name__ == '__main__':
-    test_dataset = CustomDataset(data_dir='data/', seq_len=3)
-    print(f'Length: {len(test_dataset)}')
-    print(f'Index 0: {test_dataset[0]}')
-    print(f'Index 1: {test_dataset[1]}')
+if __name__ == "__main__":
+    test_dataset = CustomDataset(data_dir="data/", seq_len=3)
+    print(f"Length: {len(test_dataset)}")
+    print(f"Index 0: {test_dataset[0]}")
+    print(f"Index 1: {test_dataset[1]}")

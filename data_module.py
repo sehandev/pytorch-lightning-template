@@ -1,7 +1,9 @@
 # Standard
 from pathlib import Path
+from typing import Optional
 
 # PIP
+from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 from pytorch_lightning import LightningDataModule
 
@@ -10,14 +12,14 @@ from custom.dataset import CustomDataset
 
 
 class CustomDataModule(LightningDataModule):
-    def __init__(self, cfg):
+    def __init__(self, cfg: DictConfig):
         super().__init__()
         self.cfg = cfg
 
         work_dir = Path(cfg.common.work_dir).absolute()
         self.data_dir = work_dir / cfg.dataset.data_dir
 
-    def setup(self, stage=None):
+    def setup(self, stage: Optional[str] = None):
         self.train_dataset = CustomDataset(
             data_dir=self.data_dir,
             seq_len=self.cfg.dataset.seq_len,
