@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pytorch lightning template"
-version = "0.1.1"
+version = "0.1.2"
 description = ""
 authors = ["sehandev <sehandev@gmail.com>"]
 license = "MIT"
@@ -8,11 +8,10 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-pytorch-lightning = "^1.7.7"
+pytorch-lightning = "^1.8.3"
 hydra-core = "^1.2.0"
-wandb = "^0.13.3"
+wandb = "^0.13.5"
 deepspeed = "^0.7.3"
-
 
 [tool.poetry.group.dev.dependencies]
 black = "^22.8.0"
